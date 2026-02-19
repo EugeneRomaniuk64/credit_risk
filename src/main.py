@@ -16,9 +16,9 @@ from sklearn.metrics import (
     brier_score_loss
 )
 
-LGD = 0.45
+LGD = 0.45 #Loss given default
 
-def find_optimal_threshold(model, X_train, y_train):
+def find_optimal_threshold(model, X_train, y_train): #We decide the probability above which loans are to be predicted as to default
     
     oof_probs = cross_val_predict(model, X_train, y_train, cv=5, method='predict_proba')[:, 1]
 
@@ -29,7 +29,7 @@ def find_optimal_threshold(model, X_train, y_train):
     
     return optimal_t
 
-def evaluate_model(model, X_test, y_test, threshold, EAD_series):
+def evaluate_model(model, X_test, y_test, threshold, EAD_series): #Here we compare models, by computing various metrics
     y_prob = model.predict_proba(X_test)[:, 1]
     y_pred = (y_prob >= threshold).astype(int)
 
@@ -64,8 +64,8 @@ df = df.dropna(subset=['loan_int_rate']) #dropping all rows without an interest 
 
 #PREPROCESSING
 
-df_num = df.select_dtypes(exclude=['object'])
-df_str = df.select_dtypes(include=['object'])
+df_num = df.select_dtypes(exclude=['str'])
+df_str = df.select_dtypes(include=['str'])
 df_str_onehot = pd.get_dummies(df_str)
 
 df = pd.concat([df_num, df_str_onehot], axis=1)
@@ -111,6 +111,7 @@ results['Gradient Boosting'] = evaluate_model(gb_model, X_test, y_test, threshol
 
 results_df = pd.DataFrame(results).T
 
+print(f'Number of loans tested: {X_test.shape[0]}\nTotal amount (USD): {np.sum(X_test['loan_amnt']):,.0f}')
 print(results_df.drop(['FPR', 'TPR', 'y_prob'], axis=1))
 
 fig, ax = plt.subplots(1, 3, figsize=(12, 6))
