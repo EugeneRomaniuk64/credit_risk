@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib
 from matplotlib import pyplot as plt
 from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split, cross_val_predict
@@ -16,6 +17,7 @@ from sklearn.metrics import (
     brier_score_loss
 )
 
+matplotlib.use('TkAgg')
 LGD = 0.45 #Loss given default
 
 def find_optimal_threshold(model, X_train, y_train): #We decide the probability above which loans are to be predicted as to default
